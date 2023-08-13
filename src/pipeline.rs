@@ -1,11 +1,10 @@
-use crate::vertex::{Vertex, INDICES, VERTICES};
+use crate::vertex::{Vertex, VERTICES};
 use wgpu::util::DeviceExt;
 
 pub struct Pipeline {
     pub render_pipeline: wgpu::RenderPipeline,
     pub vertex_buffer: wgpu::Buffer,
     pub uniform_buffer: wgpu::Buffer,
-    pub index_buffer: wgpu::Buffer,
     pub shader_binding_group: wgpu::BindGroup,
 }
 
@@ -21,13 +20,6 @@ impl Pipeline {
             label: Some("Vertex Buffer"),
             contents: bytemuck::cast_slice(VERTICES),
             usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
-        });
-
-        // Index buffer
-        let index_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("Index Buffer"),
-            contents: bytemuck::cast_slice(INDICES),
-            usage: wgpu::BufferUsages::INDEX,
         });
 
         // Uniform buffer
@@ -107,7 +99,6 @@ impl Pipeline {
             render_pipeline,
             vertex_buffer,
             uniform_buffer,
-            index_buffer,
             shader_binding_group,
         }
     }

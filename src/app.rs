@@ -13,6 +13,7 @@ pub struct App {
     queue: wgpu::Queue,
     pub surface: Surface,
     pub pipeline: Pipeline,
+    pub grid_size: u16,
 }
 
 impl App {
@@ -81,6 +82,7 @@ impl App {
             queue,
             surface: app_surface,
             pipeline,
+            grid_size,
         }
     }
 
@@ -132,12 +134,8 @@ impl App {
 
             render_pass.set_pipeline(&self.pipeline.render_pipeline);
             render_pass.set_vertex_buffer(0, self.pipeline.vertex_buffer.slice(..));
-            render_pass.set_index_buffer(
-                self.pipeline.index_buffer.slice(..),
-                wgpu::IndexFormat::Uint16,
-            );
             render_pass.set_bind_group(0, &self.pipeline.shader_binding_group, &[]);
-            render_pass.draw_indexed(0..6, 0, 0..1);
+            render_pass.draw(0..6, 0..(self.grid_size * self.grid_size) as u32);
         }
 
         self.queue.submit(std::iter::once(encoder.finish()));
