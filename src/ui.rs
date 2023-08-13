@@ -1,10 +1,10 @@
+use crate::app::App;
+use std::{thread, time};
 use winit::{
     event::*,
     event_loop::{ControlFlow, EventLoop},
     window::WindowBuilder,
 };
-
-use crate::app::App;
 
 pub async fn render(grid_size: u16) {
     env_logger::init();
@@ -15,7 +15,6 @@ pub async fn render(grid_size: u16) {
 
     event_loop.run(move |event, _, control_flow| match event {
         Event::RedrawRequested(window_id) if window_id == app.window().id() => {
-            app.update();
             match app.render() {
                 Ok(_) => {}
                 Err(wgpu::SurfaceError::Lost) => {
@@ -25,6 +24,7 @@ pub async fn render(grid_size: u16) {
                 Err(wgpu::SurfaceError::OutOfMemory) => *control_flow = ControlFlow::Exit,
                 Err(e) => eprintln!("{:?}", e),
             }
+            thread::sleep(time::Duration::from_millis(500));
         }
         Event::MainEventsCleared => {
             app.window().request_redraw();

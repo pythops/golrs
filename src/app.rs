@@ -1,4 +1,3 @@
-use crate::pipeline::Pipeline;
 use winit::window::Window;
 
 pub struct Surface {
@@ -12,8 +11,10 @@ pub struct App {
     device: wgpu::Device,
     queue: wgpu::Queue,
     pub surface: Surface,
-    pub pipeline: Pipeline,
+    pub render_pipeline: crate::pipeline::RenderPipeline,
+    pub compute_pipeline: crate::pipeline::ComputePipeline,
     pub grid_size: u16,
+    pub flip: bool,
 }
 
 impl App {
@@ -39,7 +40,7 @@ impl App {
         let (device, queue) = adapter
             .request_device(
                 &wgpu::DeviceDescriptor {
-                    features: wgpu::Features::empty(),
+                    features: wgpu::Features::VERTEX_WRITABLE_STORAGE,
                     limits: wgpu::Limits::default(),
                     label: None,
                 },
@@ -68,7 +69,10 @@ impl App {
 
         surface.configure(&device, &surface_config);
 
-        let pipeline = Pipeline::new(&device, surface_config.format, grid_size as f32);
+        let render_pipeline =
+            crate::pipeline::RenderPipeline::new(&device, surface_config.format, grid_size as f32);
+
+        let compute_pipeline = crate::pipeline::ComputePipeline::new(&device, grid_size as f32);
 
         let app_surface = Surface {
             window,
@@ -81,8 +85,10 @@ impl App {
             device,
             queue,
             surface: app_surface,
-            pipeline,
+            render_pipeline,
+            compute_pipeline,
             grid_size,
+            flip: true,
         }
     }
 
@@ -100,8 +106,6 @@ impl App {
                 .configure(&self.device, &self.surface.surface_config);
         }
     }
-
-    pub fn update(&mut self) {}
 
     pub fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
         let texture = self.surface.surface.get_current_texture()?;
@@ -132,14 +136,32 @@ impl App {
                 depth_stencil_attachment: None,
             });
 
-            render_pass.set_pipeline(&self.pipeline.render_pipeline);
-            render_pass.set_vertex_buffer(0, self.pipeline.vertex_buffer.slice(..));
-            render_pass.set_bind_group(0, &self.pipeline.shader_binding_group, &[]);
+            render_pass.set_pipeline(&self.render_pipeline.pipeline);
+            render_pass.set_vertex_buffer(0, self.render_pipeline.vertex_buffer.slice(..));
+            render_pass.set_bind_group(
+                0,
+                &self.render_pipeline.binding_groups[self.flip as usize],
+                &[],
+            );
             render_pass.draw(0..6, 0..(self.grid_size * self.grid_size) as u32);
+        }
+        {
+            let mut compute_pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
+                label: Some("Compute Pass"),
+            });
+            compute_pass.set_pipeline(&self.compute_pipeline.pipeline);
+            compute_pass.set_bind_group(
+                0,
+                &self.render_pipeline.binding_groups[self.flip as usize],
+                &[],
+            );
+            let workgroup_count = (self.grid_size as f32 / 8.0).ceil() as u32;
+            compute_pass.dispatch_workgroups(workgroup_count, workgroup_count, 1)
         }
 
         self.queue.submit(std::iter::once(encoder.finish()));
         texture.present();
+        self.flip = !self.flip;
 
         Ok(())
     }
