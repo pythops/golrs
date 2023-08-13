@@ -1,0 +1,19 @@
+[package]
+name = "golrs"
+version = "0.1.0"
+edition = "2021"
+license = "AGPL-3.0"
+description = "Game of life using webgpu"
+readme = "README.md"
+homepage = "https://github.com/pythops/golrs"
+repository = "https://github.com/pythops/golrs"
+
+
+[dependencies]
+bytemuck = { version = "1.13.1", features = ["derive"] }
+clap = { version = "4.3.21", features = ["derive", "cargo"] }
+env_logger = { version = "0.10.0" }
+log = { version = "0.4.20" }
+pollster = { version = "0.3.0" }
+wgpu = { version = "0.17.0" }
+winit = { version = "0.28.6" }
