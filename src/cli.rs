@@ -6,7 +6,7 @@ pub fn cli() -> Command {
         .arg(
             arg!(--size <size>)
                 .help("The grid size.")
-                .default_value("32")
+                .default_value("128")
                 .required(false)
                 .value_parser(clap::value_parser!(u16).range(1..)),
         )

@@ -24,7 +24,7 @@ $ cargo run
 
 ## ⚙️ Configuration
 
-You can specify the grid size with `size` argument (the default value is `32`)
+You can specify the grid size with `size` argument (the default value is `128`)
 
 ```
 $ cargo run -- --size <grid size: u16>
