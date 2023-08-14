@@ -2,6 +2,8 @@
     Game of Life using webgpu
 </h1>
 
+This is the implementation of the tutorial [Your first WebGPU app](https://codelabs.developers.google.com/your-first-webgpu-app) in Rust.
+
 ## Setup
 
 You need:
