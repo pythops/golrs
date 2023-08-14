@@ -1,6 +1,6 @@
 <div align="center">
     <h1>Game of Life using webgpu</h1>
-    <img src="assets/demo.jpg">
+    <img src="assets/demo.gif">
 </div>
 
 ## ✨ Description
