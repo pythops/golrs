@@ -1,4 +1,4 @@
-use crate::vertex::{Vertex, VERTICES};
+use crate::vertex::{Vertex, INDICES, VERTICES};
 use rand::Rng;
 use wgpu::util::DeviceExt;
 
@@ -6,6 +6,7 @@ pub struct RenderPipeline {
     pub pipeline: wgpu::RenderPipeline,
     pub vertex_buffer: wgpu::Buffer,
     pub uniform_buffer: wgpu::Buffer,
+    pub index_buffer: wgpu::Buffer,
     pub binding_groups: Vec<wgpu::BindGroup>,
 }
 
@@ -25,7 +26,9 @@ fn pipeline_layout(device: &wgpu::Device, grid_size: f32) -> SharedPipelineLayou
             entries: &[
                 wgpu::BindGroupLayoutEntry {
                     binding: 0,
-                    visibility: wgpu::ShaderStages::VERTEX | wgpu::ShaderStages::COMPUTE,
+                    visibility: wgpu::ShaderStages::VERTEX
+                        | wgpu::ShaderStages::FRAGMENT
+                        | wgpu::ShaderStages::COMPUTE,
                     ty: wgpu::BindingType::Buffer {
                         ty: wgpu::BufferBindingType::Uniform,
                         has_dynamic_offset: false,
@@ -152,6 +155,14 @@ impl RenderPipeline {
             contents: bytemuck::cast_slice(VERTICES),
             usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
         });
+
+        // Index buffer
+        let index_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("Index Buffer"),
+            contents: bytemuck::cast_slice(INDICES),
+            usage: wgpu::BufferUsages::INDEX,
+        });
+
         let shared_pipeline_layout = pipeline_layout(device, grid_size);
 
         let uniform_buffer = shared_pipeline_layout.uniform_buffer;
@@ -197,6 +208,7 @@ impl RenderPipeline {
             pipeline,
             vertex_buffer,
             uniform_buffer,
+            index_buffer,
             binding_groups,
         }
     }

@@ -5,14 +5,12 @@
 
 struct VertexInput {
     @location(0) position: vec2<f32>,
-    @location(1) color: vec3<f32>,
     @builtin(instance_index) cell_instance: u32,
 };
 
 struct VertexOutput {
-    @builtin(position) pos: vec4f,
-    @location(0) cell: vec2f,
-    @location(1) color: vec3f,
+    @builtin(position) pos: vec4<f32>,
+    @location(0) cell: vec2<f32>,
 };
 
 
@@ -32,12 +30,12 @@ fn vs_main(input: VertexInput) -> VertexOutput {
     var out: VertexOutput;
     out.pos = vec4f(cell_postition, 0.0, 1.0);
     out.cell = cell;
-    out.color = input.color;
 
     return out;
 }
 
 @fragment
 fn fs_main(input: VertexOutput) -> @location(0) vec4f {
-    return vec4f(input.color, 1.0);
+    let c = input.cell / grid;
+    return vec4f(c, 1.0 - c.x, 1.0);
 }

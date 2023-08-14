@@ -138,12 +138,16 @@ impl App {
 
             render_pass.set_pipeline(&self.render_pipeline.pipeline);
             render_pass.set_vertex_buffer(0, self.render_pipeline.vertex_buffer.slice(..));
+            render_pass.set_index_buffer(
+                self.render_pipeline.index_buffer.slice(..),
+                wgpu::IndexFormat::Uint16,
+            );
             render_pass.set_bind_group(
                 0,
                 &self.render_pipeline.binding_groups[self.flip as usize],
                 &[],
             );
-            render_pass.draw(0..6, 0..(self.grid_size * self.grid_size) as u32);
+            render_pass.draw_indexed(0..6, 0, 0..(self.grid_size * self.grid_size) as u32);
         }
         {
             let mut compute_pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
