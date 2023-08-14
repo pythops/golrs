@@ -24,7 +24,7 @@ pub async fn render(grid_size: u16) {
                 Err(wgpu::SurfaceError::OutOfMemory) => *control_flow = ControlFlow::Exit,
                 Err(e) => eprintln!("{:?}", e),
             }
-            thread::sleep(time::Duration::from_millis(500));
+            thread::sleep(time::Duration::from_millis(50));
         }
         Event::MainEventsCleared => {
             app.window().request_redraw();

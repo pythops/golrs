@@ -1,5 +1,7 @@
 use winit::window::Window;
 
+use crate::pipeline::{ComputePipeline, RenderPipeline};
+
 pub struct Surface {
     window: Window,
     surface: wgpu::Surface,
@@ -11,8 +13,8 @@ pub struct App {
     device: wgpu::Device,
     queue: wgpu::Queue,
     pub surface: Surface,
-    pub render_pipeline: crate::pipeline::RenderPipeline,
-    pub compute_pipeline: crate::pipeline::ComputePipeline,
+    pub render_pipeline: RenderPipeline,
+    pub compute_pipeline: ComputePipeline,
     pub grid_size: u16,
     pub flip: bool,
 }
