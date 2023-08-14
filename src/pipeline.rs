@@ -65,9 +65,9 @@ fn pipeline_layout(device: &wgpu::Device, grid_size: f32) -> SharedPipelineLayou
 
     // Storage buffers
     let mut rng = rand::thread_rng();
-    let mut cell_state_1 = vec![0; (grid_size * grid_size) as usize];
+    let mut cell_state = vec![0; (grid_size * grid_size) as usize];
 
-    cell_state_1.iter_mut().for_each(|x| {
+    cell_state.iter_mut().for_each(|x| {
         if rng.gen::<f32>() > 0.5 {
             *x = 1;
         } else {
@@ -76,14 +76,13 @@ fn pipeline_layout(device: &wgpu::Device, grid_size: f32) -> SharedPipelineLayou
     });
     let storage_buffer_1 = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
         label: Some("Storage Buffer 1"),
-        contents: bytemuck::cast_slice(&cell_state_1),
+        contents: bytemuck::cast_slice(&cell_state),
         usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_DST,
     });
 
-    let cell_state_2 = vec![0; (grid_size * grid_size) as usize];
     let storage_buffer_2 = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
         label: Some("Storage Buffer 2"),
-        contents: bytemuck::cast_slice(&cell_state_2),
+        contents: bytemuck::cast_slice(&cell_state),
         usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_DST,
     });
 
