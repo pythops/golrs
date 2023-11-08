@@ -2,33 +2,35 @@ use winit::window::Window;
 
 use crate::pipeline::{ComputePipeline, RenderPipeline};
 
-pub struct Surface {
-    window: Window,
+pub struct Surface<'a> {
+    window: &'a Window,
     surface: wgpu::Surface,
     surface_config: wgpu::SurfaceConfiguration,
     pub surface_size: winit::dpi::PhysicalSize<u32>,
 }
 
-pub struct App {
+pub struct App<'a> {
     device: wgpu::Device,
     queue: wgpu::Queue,
-    pub surface: Surface,
+    pub surface: Surface<'a>,
     pub render_pipeline: RenderPipeline,
     pub compute_pipeline: ComputePipeline,
     pub grid_size: u16,
     pub flip: bool,
 }
 
-impl App {
-    pub async fn new(window: Window, grid_size: u16) -> Self {
+impl<'a> App<'a> {
+    pub async fn new(window: &'a Window, grid_size: u16) -> App<'a> {
         let window_size = window.inner_size();
 
         let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
             backends: wgpu::Backends::all(),
             dx12_shader_compiler: Default::default(),
+            flags: Default::default(),
+            gles_minor_version: Default::default(),
         });
 
-        let surface = unsafe { instance.create_surface(&window) }.unwrap();
+        let surface = unsafe { instance.create_surface(window) }.unwrap();
 
         let adapter = instance
             .request_adapter(&wgpu::RequestAdapterOptions {
@@ -95,7 +97,7 @@ impl App {
     }
 
     pub fn window(&self) -> &Window {
-        &self.surface.window
+        self.surface.window
     }
 
     pub fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
@@ -132,10 +134,12 @@ impl App {
                             b: 0.0,
                             a: 1.0,
                         }),
-                        store: true,
+                        store: wgpu::StoreOp::Store,
                     },
                 })],
                 depth_stencil_attachment: None,
+                timestamp_writes: None,
+                occlusion_query_set: None,
             });
 
             render_pass.set_pipeline(&self.render_pipeline.pipeline);
@@ -154,6 +158,7 @@ impl App {
         {
             let mut compute_pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
                 label: Some("Compute Pass"),
+                timestamp_writes: None,
             });
             compute_pass.set_pipeline(&self.compute_pipeline.pipeline);
             compute_pass.set_bind_group(
