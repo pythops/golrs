@@ -16,7 +16,7 @@ You need:
 
 ## 🚀 Getting started
 
-```
+```bash
 $ git clone https://github.com/pythops/golrs
 $ cd golrs/
 $ cargo run
@@ -26,9 +26,8 @@ $ cargo run
 
 You can specify the grid size with `size` argument (the default value is `128`)
 
-```
-$ cargo run -- --size <grid size: u16>
-
+```bash
+$ cargo run -- --size <grid size: u8>
 ```
 
 ## License
