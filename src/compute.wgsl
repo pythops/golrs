@@ -19,13 +19,13 @@ fn cs_main(@builtin(global_invocation_id) cell: vec3u) {
     let cell_index = get_cell_index(cell.xy);
 
     switch active_neighbots {
-        case 2u {
+        case 2u: {
             cell_state_out[cell_index] = cell_state_in[cell_index];
         }
-        case 3u {
+        case 3u: {
             cell_state_out[cell_index] = 1u;
         }
-        default {
+        default :{
             cell_state_out[cell_index] = 0u;
         }
     }
